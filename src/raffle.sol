@@ -141,4 +141,12 @@ event pickedWinner(address indexed winner );
     function getEntranceFee()view external returns(uint256) {
         return i_entranceFee;
     }
+
+    function getRaffleInitialState() view external returns(raffleState) {
+         return(s_raffleState);
+    }
+
+    function getPlayer(uint256 indexOfPlayer) public view returns(address) {
+        return(s_players[indexOfPlayer]);
+    }
 }

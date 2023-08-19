@@ -9,7 +9,7 @@ import { HelperConfig } from "script/HelperConfig.s.sol";
 contract Deploy  is Script{
 Raffle RaffleDeploy;
 
-function run() external returns(Raffle){
+function run() external returns(Raffle, HelperConfig){
 
 HelperConfig helperConfig = new HelperConfig();
 (uint256 entranceFee,
@@ -30,6 +30,6 @@ HelperConfig helperConfig = new HelperConfig();
         callBackGasLimit
     );
         vm.stopBroadcast();
-      return(raffle);
+      return(raffle, helperConfig);
 }
 }   
