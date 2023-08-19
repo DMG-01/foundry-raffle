@@ -8,6 +8,11 @@ import {Raffle} from "src/raffle.sol";
 import { HelperConfig} from "script/HelperConfig.s.sol";
 
 contract RaffleTest is Test {
+
+/* EVENTS */
+event enteredRaffle(address indexed player);
+
+
 Raffle raffle;
 HelperConfig helperConfig;
 address public PLAYER = makeAddr("player");
@@ -45,7 +50,7 @@ vm.deal(PLAYER,STARTING_BALANCE);
     }
     function testRaffleRevertWhenYouDontPayEnough() public {
         vm.prank(PLAYER);
-        vm.expectRevert(Raffle.Raffle__notEnoughEthSent.selector);
+        vm.expectRevert(Raffle.Raffle__SendMoreToEnterRaffle.selector);
         raffle.enterRaffle();
     }
      function testRaffleRecordsPlayerWhenTheyEnter() public {
@@ -57,5 +62,11 @@ vm.deal(PLAYER,STARTING_BALANCE);
         address playerRecorded = raffle.getPlayer(0);
         assert(playerRecorded == PLAYER);
     }
+    function testEmitsEventsOnEntrance() public {
+        vm.prank(PLAYER);
+        vm.expectEmit(true,false, false,false,address(raffle));
+        emit enteredRaffle(PLAYER);
+        raffle.enterRaffle{value:entranceFee}();
 
     }
+}

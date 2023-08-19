@@ -27,9 +27,9 @@ import {VRFConsumerBaseV2} from "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2
 
 
 contract Raffle is VRFConsumerBaseV2{
-error Raffle__notEnoughEthSent();
+error Raffle__SendMoreToEnterRaffle();
 error Raffle__transferFailed();
-error Raffle__raffleNotOpen();
+error Raffle__RaffleNotOpen();
 error Raffle__upKeepNotNeeded(uint256 currentBalance,uint256 numberOfPlayers,uint256 raffleState);
 
 enum raffleState {
@@ -52,7 +52,7 @@ uint32 private constant NUM_WORD = 1;
     
     uint256 private s_lastTimeStamp;
 
-event enteredRaffle(address indexed player);
+event RaffleEnter(address indexed player);
 event pickedWinner(address indexed winner );
 
 
@@ -77,16 +77,21 @@ event pickedWinner(address indexed winner );
    
     }
 
-    function enterRaffle() external payable {
-        if(msg.value < i_entranceFee){
-            revert Raffle__notEnoughEthSent();
+  function enterRaffle() public payable {
+        // require(msg.value >= i_entranceFee, "Not enough value sent");
+        // require(s_raffleState == RaffleState.OPEN, "Raffle is not open");
+        if (msg.value < i_entranceFee) {
+            revert Raffle__SendMoreToEnterRaffle();
         }
-        if(s_raffleState != raffleState.OPEN){
-            revert Raffle__raffleNotOpen();
+        if (s_raffleState != raffleState.OPEN) {
+            revert Raffle__RaffleNotOpen();
         }
-        s_players.push(payable(msg.sender)); 
-        emit enteredRaffle(msg.sender);
+        s_players.push(payable(msg.sender));
+        // Emit an event when we update a dynamic array or mapping
+        // Named events with the function name reversed
+        emit RaffleEnter(msg.sender);
     }
+
 
     function checkUpKeep(bytes memory /* */ ) public view returns(bool upKeepNeeded, bytes memory /*perform data*/){
        bool timeHasPassed = (block.timestamp - s_lastTimeStamp) >=  i_interval;
